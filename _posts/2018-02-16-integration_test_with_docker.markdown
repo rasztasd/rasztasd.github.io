@@ -5,7 +5,7 @@ date:   2018-02-16 13:18:27 +0100
 categories: programming testing docker
 ---
 # Why containers are useful
-Using some kind of virtualization for testing a software is always a good idea. Containers are a kind of virtualization technology but it doesn't virtualize a whole computer, but only a smaller subset of functions (networking, filesytem and processes).
+Using some kind of virtualization for testing a software is always a good idea. Containers are a kind of virtualization technology but it doesn't virtualize a whole computer, but only a smaller subset of functions of a computer or operating system (networking, filesytem and processes).
 
 By using containers you can ensure that your program dependencies stay the same in every environment, just like it would in a virtual machine. You don't have to get the correct version of libraries and tools (for example apache http or a specific version of a database management system, or a specific version of java or go compiler) for each environment (be it a developer machine, staging or production server).
 
@@ -93,7 +93,6 @@ integration_test_in_docker:
 		-v "${PWD}":/go/src/github/rasztasd/sample_go_and_docker/ \
 		-w /go/src/github/rasztasd/sample_go_and_docker/ \
 		golang:1.9 /bin/sh -c "go test -v integration_test.go"
-	cat .selenium_container_id | xargs -I{} docker stop {}
 	cat .application_server_container_id | xargs -I{} docker stop {}
 {% endhighlight %}
 
