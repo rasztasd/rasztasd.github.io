@@ -54,14 +54,12 @@ build_in_docker:
 	docker run -w /go/src/github.com/rasztasd/sample_go_and_docker -v `pwd`:/go/src/github.com/rasztasd/sample_go_and_docker golang:1.9 /bin/sh -c "make do_build"
 
 {% endhighlight %}
-Call ```make build_in_docker``` in the command line to build the artifacts. Because the ```go build -o build/http_server .``` will put the built artifact to the build folder, which is mounted to the current folder, after the build the artifact will be visible.
-
-If we didn't mount our current folder to the docker or mount to a different location, then the artifacts after the build would no be visible automatically and we would have to ```docker cp``` it.
+Call ```make build_in_docker``` in the command line to build the artifacts. Because the ```go build -o build/http_server .``` will put the built artifact to the build folder, which is mounted to the current folder.
 
 So with the above Makefile you can build your go files without having go lang installed on your machine. Only docker is required.
 
 # Sample e2e/integration test code
-This is a very simple test. Test where the http status is 200 or not.
+This is a very simple test. Test whether the http status is 200 or not.
 {% highlight go linenos %}
 
 package test
@@ -87,15 +85,15 @@ func TestBasicConnectionNoStatusCodeOtherThan200OnIndexURL(*testing.T) {
 {% endhighlight %}
 
 # Run test inside docker
+With the below code you will run your web server in a docker container and run **go test -v integration_test.go** in a different container.
 {% highlight makefile linenos %}
 integration_test_in_docker:
 	docker run --network=host -d -v "${PWD}"/build:/bin2 ubuntu:16.04 /bin/sh -c "/bin2/http_server" > .application_server_container_id
 	docker run --network=host --rm \
-		-e "http_proxy=${http_proxy}" \
-		-e "https_proxy=${https_proxy}" \
 		-v "${PWD}":/go/src/github/rasztasd/sample_go_and_docker/ \
 		-w /go/src/github/rasztasd/sample_go_and_docker/ \
-		golang:1.9 /bin/sh -c "make do_integration_test_in_docker"
+		golang:1.9 /bin/sh -c "go test -v integration_test.go"
+	cat .selenium_container_id | xargs -I{} docker stop {}
 	cat .application_server_container_id | xargs -I{} docker stop {}
 {% endhighlight %}
 
